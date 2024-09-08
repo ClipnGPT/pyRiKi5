@@ -344,7 +344,7 @@ class _perplexityAPI:
                 session_id='admin', history=[], function_modules=[],
                 sysText=None, reqText=None, inpText='こんにちは',
                 upload_files=[], image_urls=[], 
-                temperature=0.8, max_step=10, jsonMode=False, ):
+                temperature=0.8, max_step=10, jsonSchema=None, ):
 
         # 戻り値
         res_text        = ''
@@ -579,7 +579,8 @@ class _perplexityAPI:
                 session_id='admin', history=[], function_modules=[],
                 sysText=None, reqText=None, inpText='こんにちは', 
                 filePath=[],
-                temperature=0.8, max_step=10, inpLang='ja-JP', outLang='ja-JP', ):
+                temperature=0.8, max_step=10, jsonSchema=None,
+                inpLang='ja-JP', outLang='ja-JP', ):
 
         # 戻り値
         res_text    = ''
@@ -615,7 +616,7 @@ class _perplexityAPI:
                         session_id=session_id, history=res_history, function_modules=function_modules,
                         sysText=sysText, reqText=reqText, inpText=inpText,
                         upload_files=upload_files, image_urls=image_urls,
-                        temperature=temperature, max_step=max_step, )
+                        temperature=temperature, max_step=max_step, jsonSchema=jsonSchema, )
 
         # 文書成形
         text = self.text_replace(text=res_text, )

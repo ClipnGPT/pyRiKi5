@@ -956,7 +956,7 @@ class ChatBotAPI:
                 session_id='admin', history=[], function_modules=[],
                 sysText=None, reqText=None, inpText='こんにちは',
                 upload_files=[], image_urls=[], 
-                temperature=0.8, max_step=10, jsonMode=False, ):
+                temperature=0.8, max_step=10, jsonSchema=None, ):
 
         #self.assistant_id[str(session_id)] = None
         self.thread_id[str(session_id)] = None
@@ -1183,7 +1183,7 @@ class ChatBotAPI:
                                 )
 
                     else:
-                        if (jsonMode == False):
+                        if (jsonSchema is None) or (jsonSchema == ''):
                             completions = self.client_ab.chat.completions.create(
                                 model           = res_api,
                                 messages        = msg,
@@ -1192,14 +1192,31 @@ class ChatBotAPI:
                                 stream          = stream, 
                                 )
                         else:
-                            completions = self.client_ab.chat.completions.create(
-                                model           = res_api,
-                                messages        = msg,
-                                temperature     = float(temperature),
-                                timeout         = self.timeOut, 
-                                response_format = { "type": "json_object" },
-                                stream          = stream, 
-                                )
+                            schema = None
+                            try:
+                                schema = json.loads(jsonSchema)
+                            except:
+                                pass
+                            # スキーマ指定無し
+                            if (schema is None):
+                                completions = self.client_ab.chat.completions.create(
+                                    model           = res_api,
+                                    messages        = msg,
+                                    temperature     = float(temperature),
+                                    timeout         = self.timeOut, 
+                                    response_format = { "type": "json_object" },
+                                    stream          = stream, 
+                                    )
+                            # スキーマ指定有り
+                            else:
+                                completions = self.client_ab.chat.completions.create(
+                                    model           = res_api,
+                                    messages        = msg,
+                                    temperature     = float(temperature),
+                                    timeout         = self.timeOut, 
+                                    response_format = { "type": "json_schema", "json_schema": schema },
+                                    stream          = stream, 
+                                    )
 
                 # Azure
                 else:
@@ -1229,7 +1246,7 @@ class ChatBotAPI:
                                 )
 
                     else:
-                        # if (jsonMode == False):
+                        # if (jsonSchema is None) or (jsonSchema == ''):
                         completions = self.client_ab.chat.completions.create(
                                 model           = res_api,
                                 messages        = msg,
@@ -1761,7 +1778,7 @@ class ChatBotAPI:
                       session_id='admin', history=[], function_modules=[],
                       sysText=None, reqText=None, inpText='こんにちは',
                       upload_files=[], image_urls=[],
-                      temperature=0.8, max_step=10, jsonMode=False, ):
+                      temperature=0.8, max_step=10, jsonSchema=None, ):
 
         functions = []
         for module_dic in function_modules:
@@ -2339,7 +2356,7 @@ class ChatBotAPI:
                       session_id='admin', history=[], function_modules=[], 
                       sysText=None, reqText=None, inpText='こんにちは',
                       upload_files=[], image_urls=[],
-                      temperature=0.8, max_step=10, jsonMode=False, ):
+                      temperature=0.8, max_step=10, jsonSchema=None, ):
 
         # 戻り値
         res_text    = ''
@@ -2412,6 +2429,7 @@ class ChatBotAPI:
 # 3) 上記以外の場合や継続実行がむつかしいと考えられる場合、continue=stop,result_point=達成率,assessment_text=評価理由
 
         # GPT 評価判定（準備）
+        auto_jsonSchema = '{"continue": str, "result_point": str, "assessment_text": str,}'
         auto_sysText = \
 """
 ----- Your Role -----
@@ -2462,7 +2480,7 @@ Respond according to the following criteria:
                                     session_id=session_id, history=res_history, function_modules=function_modules, 
                                     sysText=sysText, reqText=reqText, inpText=inpText,
                                     upload_files=upload_files, image_urls=image_urls,
-                                    temperature=temperature, max_step=max_step, jsonMode=jsonMode, )
+                                    temperature=temperature, max_step=max_step, jsonSchema=jsonSchema, )
             
             if  (res_text2 is not None) \
             and (res_text2 != '') \
@@ -2494,7 +2512,7 @@ Respond according to the following criteria:
                                  nick_name=None, model_name=None,
                                  session_id='internal', history=[], function_modules=[],
                                  sysText=auto_sysText, reqText=auto_reqText, inpText=check_inpText,
-                                 upload_files=[], image_urls=[], jsonMode=True, )
+                                 upload_files=[], image_urls=[], jsonSchema=auto_jsonSchema, )
 
                 continue_yn     = None
                 result_point    = None
@@ -2547,7 +2565,8 @@ Respond according to the following criteria:
                 session_id='admin', history=[], function_modules=[],
                 sysText=None, reqText=None, inpText='こんにちは', 
                 filePath=[],
-                temperature=0.8, max_step=10, inpLang='ja-JP', outLang='ja-JP', ):
+                temperature=0.8, max_step=10, jsonSchema=None,
+                inpLang='ja-JP', outLang='ja-JP', ):
 
         # 戻り値
         res_text        = ''
@@ -2625,7 +2644,7 @@ Respond according to the following criteria:
                                  session_id=session_id, history=res_history, function_modules=function_modules,
                                  sysText=sysText, reqText=reqText, inpText=inpText,
                                  upload_files=upload_files, image_urls=image_urls,
-                                 temperature=temperature, max_step=max_step, )
+                                 temperature=temperature, max_step=max_step, jsonSchema=jsonSchema, )
             #except Exception as e:
             #    print(e)
 
@@ -2638,7 +2657,7 @@ Respond according to the following criteria:
                                         session_id=session_id, history=res_history, function_modules=function_modules,
                                         sysText=sysText, reqText=reqText, inpText=inpText,
                                         upload_files=upload_files, image_urls=image_urls,
-                                        temperature=temperature, max_step=max_step, )
+                                        temperature=temperature, max_step=max_step, jsonSchema=jsonSchema, )
             #except Exception as e:
             #    print(e)
 

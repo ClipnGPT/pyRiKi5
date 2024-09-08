@@ -75,6 +75,12 @@ class _geminiAPI:
         self.gemini_x_model         = None
         self.gemini_x_token         = 0
 
+        self.safety_settings        = [ {"category": "HARM_CATEGORY_DANGEROUS", "threshold": "BLOCK_NONE" },
+                                        {"category": "HARM_CATEGORY_HARASSMENT","threshold": "BLOCK_NONE" },
+                                        {"category": "HARM_CATEGORY_HATE_SPEECH","threshold": "BLOCK_NONE" },
+                                        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
+                                        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }, ]
+
         self.history                = []
 
         self.seq                    = 0
@@ -358,7 +364,7 @@ class _geminiAPI:
                 session_id='admin', history=[], function_modules=[],
                 sysText=None, reqText=None, inpText='こんにちは',
                 upload_files=[], image_urls=[], 
-                temperature=0.8, max_step=10, jsonMode=False, ):
+                temperature=0.8, max_step=10, jsonSchema=None, ):
 
         # 戻り値
         res_text        = ''
@@ -551,7 +557,7 @@ class _geminiAPI:
                 tools.append(func)
 
         # gemini 設定
-        if (jsonMode != True):
+        if (jsonSchema is None) or (jsonSchema == ''):
             generation_config_normal = {
                 "temperature": temperature,
                 "top_p": 0.95,
@@ -562,8 +568,11 @@ class _geminiAPI:
             gemini = genai.GenerativeModel(
                             model_name=res_api,
                             generation_config=generation_config_normal,
-                            system_instruction=sysText, tools=tools, )
+                            system_instruction=sysText, tools=tools, 
+                            safety_settings=self.safety_settings, )
         else:
+            # 2024/09/04時点 スキーマ実行時はtools使えない！
+            tools = []
             generation_config_json = {
                 "temperature": temperature,
                 "top_p": 0.95,
@@ -574,7 +583,8 @@ class _geminiAPI:
             gemini = genai.GenerativeModel( 
                             model_name=res_api,
                             generation_config=generation_config_json,
-                            system_instruction=sysText, tools=tools, )
+                            system_instruction=sysText, tools=tools, 
+                            safety_settings=self.safety_settings, )
 
         # # ファイル削除
         # files = genai.list_files()
@@ -812,7 +822,8 @@ class _geminiAPI:
                 session_id='admin', history=[], function_modules=[],
                 sysText=None, reqText=None, inpText='こんにちは', 
                 filePath=[],
-                temperature=0.8, max_step=10, inpLang='ja-JP', outLang='ja-JP', ):
+                temperature=0.8, max_step=10, jsonSchema=None,
+                inpLang='ja-JP', outLang='ja-JP', ):
 
         # 戻り値
         res_text    = ''
@@ -848,7 +859,7 @@ class _geminiAPI:
                         session_id=session_id, history=res_history, function_modules=function_modules,
                         sysText=sysText, reqText=reqText, inpText=inpText,
                         upload_files=upload_files, image_urls=image_urls,
-                        temperature=temperature, max_step=max_step, )
+                        temperature=temperature, max_step=max_step, jsonSchema=jsonSchema, )
 
         # 文書成形
         text = self.text_replace(text=res_text, )
