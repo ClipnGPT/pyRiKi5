@@ -270,7 +270,30 @@ class _ollamaAPI:
     def setTimeOut(self, timeOut=60, ):
         self.timeOut = timeOut
 
-    def text_replace(self, text='', ):
+    def text_replace(self, text=''):
+        if "```" not in text:
+            return self.text_replace_sub(text)
+        else:
+            # ```が2か所以上含まれている場合の処理
+            first_triple_quote_index = text.find("```")
+            last_triple_quote_index = text.rfind("```")
+            if first_triple_quote_index == last_triple_quote_index:
+                return self.text_replace_sub(text)
+            # textの先頭から最初の```までをtext_replace_subで成形
+            text_before_first_triple_quote = text[:first_triple_quote_index]
+            formatted_before = self.text_replace_sub(text_before_first_triple_quote)
+            formatted_before = formatted_before.strip() + '\n'
+            # 最初の```から最後の```の直前までを文字列として抽出
+            code_block = text[first_triple_quote_index : last_triple_quote_index]
+            code_block = code_block.strip() + '\n'
+            # 最後の```以降の部分をtext_replace_subで成形
+            text_after_last_triple_quote = text[last_triple_quote_index:]
+            formatted_after = self.text_replace_sub(text_after_last_triple_quote)
+            formatted_after = formatted_after.strip() + '\n'
+            # 結果を結合して戻り値とする
+            return (formatted_before + code_block + formatted_after).strip()
+
+    def text_replace_sub(self, text='', ):
         if (text.strip() == ''):
             return ''
 
