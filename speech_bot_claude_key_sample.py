@@ -25,8 +25,8 @@ def getkey(api, key):
             return 'use chat auto continue'
         if (key == 'claude_max_step'):
             return 'chat max step'
-        if (key == 'claude_max_assistant'):
-            return 'use max assistant'
+        if (key == 'claude_max_session'):
+            return 'use max session'
 
         if (key == 'claude_key_id'):
             return 'your claude key'

@@ -25,8 +25,8 @@ def getkey(api, key):
             return 'use chat auto continue'
         if (key == 'perplexity_max_step'):
             return 'chat max step'
-        if (key == 'perplexity_max_assistant'):
-            return 'use max assistant'
+        if (key == 'perplexity_max_session'):
+            return 'use max session'
 
         if (key == 'perplexity_key_id'):
             return 'your perplexity key'

@@ -25,8 +25,8 @@ def getkey(api, key):
             return 'use chat auto continue'
         if (key == 'openai_max_step'):
             return 'chat max step'
-        if (key == 'openai_max_assistant'):
-            return 'use max assistant'
+        if (key == 'openai_max_session'):
+            return 'use max session'
 
         if (key == 'openai_organization'):
             return 'your openai organization'
